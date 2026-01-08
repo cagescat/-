@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>子爵小姐的婚事 - 贵族婚恋游戏</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cormorant Garamond', serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a0f0f 0%, #2d1b1b 100%);
+            color: #e8d8c3;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(120, 80, 50, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(100, 60, 30, 0.1) 0%, transparent 20%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        #game-container {
+            width: 100%;
+            max-width: 420px;
+            height: 720px;
+            background: 
+                linear-gradient(160deg, #3d2819 0%, #2c1c12 30%, #1a120b 100%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="%235a3d2c" stroke-width="2" stroke-opacity="0.3"/><path d="M10,10 L90,10 L90,90 L10,90 Z" fill="none" stroke="%235a3d2c" stroke-width="1" stroke-opacity="0.2"/></svg>');
+            border-radius: 16px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.6),
+                inset 0 0 0 1px rgba(200, 150, 100, 0.3),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid #8b7355;
+        }
+        
+        /* 贵族纹章装饰 */
+        .heraldic-decoration {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+        }
+        
+        .decoration-1 {
+            top: 10px;
+            left: 10px;
+            width: 60px;
+            height: 60px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,10 Q70,30 90,50 Q70,70 50,90 Q30,70 10,50 Q30,30 50,10 Z" fill="none" stroke="%23d4af37" stroke-width="2"/><circle cx="50" cy="50" r="20" fill="none" stroke="%23d4af37" stroke-width="1.5"/></svg>');
+            background-size: contain;
+        }
+        
+        .decoration-2 {
+            bottom: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,50 L50,20 L80,50 L50,80 Z" fill="none" stroke="%23d4af37" stroke-width="2"/><path d="M35,50 L50,35 L65,50 L50,65 Z" fill="none" stroke="%23d4af37" stroke-width="1.5"/></svg>');
+            background-size: contain;
+        }
+        
+        /* 顶部状态栏 - 贵族风格 */
+        #status-bar {
+            background: linear-gradient(to right, #5d4037 0%, #3e2723 100%);
+            color: #d4af37;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #8b7355;
+            font-family: 'Cinzel', serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        #status-bar::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+        
+        #month-display {
+            background-color: rgba(26, 18, 11, 0.7);
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #8b7355;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        
+        #month-display i {
+            margin-right: 8px;
+            color: #d4af37;
+        }
+        
+        #reputation {
+            display: flex;
+            align-items: center;
+            background-color: rgba(26, 18, 11, 0.7);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #8b7355;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        
+        #reputation i {
+            margin-right: 8px;
+            color: #ffd700;
+        }
+        
+        /* 游戏标题 */
+        #game-header {
+            padding: 18px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(61, 40, 25, 0.9) 0%, rgba(44, 28, 18, 0.9) 100%);
+            border-bottom: 1px solid #6d4c3d;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #game-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+        
+        #game-header h1 {
+            font-size: 22px;
+            color: #d4af37;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        #game-header h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8b7355, transparent);
+        }
+        
+        #game-header p {
+            font-size: 13px;
+            color: #c9b29a;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* 对话区域 */
+        #chat-area {
+            flex-grow: 1;
+            padding: 18px;
+            overflow-y: auto;
+            background-color: rgba(26, 18, 11, 0.85);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scroll-behavior: smooth;
+            background-image: 
+                linear-gradient(rgba(139, 115, 85, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 115, 85, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .message {
+            max-width: 88%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            position: relative;
+            animation: messageAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(139, 115, 85, 0.3);
+        }
+        
+        @keyframes messageAppear {
+            0% { 
+                opacity: 0; 
+                transform: translateY(15px) scale(0.95); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, #5d4037 0%, #3e2723 100%);
+            align-self: flex-end;
+            border-top-right-radius: 4px;
+            color: #e8d8c3;
+            border-left: 3px solid #d4af37;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+        
+        .ai-message {
+            background: linear-gradient(135deg, #3e2723 0%, #261a13 100%);
+            align-self: flex-start;
+            border-top-left-radius: 4px;
+            color: #e8d8c3;
+            border-right: 3px solid #8b7355;
+        }
+        
+        .message-sender {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.5px;
+        }
+        
+        .message-sender img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 1px solid #8b7355;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .message-content {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .system-message {
+            background: linear-gradient(135deg, rgba(44, 28, 18, 0.9) 0%, rgba(61, 40, 25, 0.9) 100%);
+            align-self: center;
+            text-align: center;
+            font-size: 13px;
+            color: #c9b29a;
+            border-radius: 10px;
+            padding: 10px 16px;
+            border: 1px solid #6d4c3d;
+            font-style: italic;
+            max-width: 95%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* 行动选择区域 - 精简为一行 */
+        #action-area {
+            padding: 12px 18px;
+            background: linear-gradient(to top, #3e2723 0%, #2c1c12 100%);
+            border-top: 2px solid #6d4c3d;
+            position: relative;
+            min-height: 80px;
+        }
+        
+        #action-area::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+        
+        #action-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #d4af37;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-family: 'Cinzel', serif;
+            white-space: nowrap;
+        }
+        
+        #action-title i {
+            margin-right: 8px;
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        /* 行动按钮容器 - 单行水平滚动 */
+        #action-buttons-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            padding-bottom: 5px;
+            scrollbar-width: thin;
+            scrollbar-color: #8b7355 #2c1c12;
+        }
+        
+        #action-buttons {
+            display: inline-flex;
+            gap: 8px;
+            padding-right: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            background: linear-gradient(to bottom, #8b7355 0%, #6d4c3d 100%);
+            border: none;
+            border-radius: 8px;
+            color: #f5e9d9;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            text-align: center;
+            min-height: 36px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(to bottom, #9c815e 0%, #7d5a44 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(212, 175, 55, 0.3);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+            transition: all 0.1s;
+        }
+        
+        .action-btn i {
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        
+        .action-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+        }
+        
+        /* 行动点指示器 */
+        #action-points {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #c9b29a;
+        }
+        
+        .action-point {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #8b7355;
+        }
+        
+        .action-point.used {
+            background-color: #5d4037;
+            opacity: 0.5;
+        }
+        
+        .action-point.available {
+            background-color: #d4af37;
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+        }
+        
+        /* 底部输入区域 */
+        #input-area {
+            padding: 16px 18px;
+            background: linear-gradient(to top, #2c1c12 0%, #1a120b 100%);
+            border-top: 2px solid #5d4037;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+        }
+        
+        #input-area::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8b7355, transparent);
+        }
+        
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 18px;
+            border: 1px solid #6d4c3d;
+            border-radius: 25px;
+            background-color: rgba(26, 18, 11, 0.9);
+            color: #e8d8c3;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+        
+        #user-input:focus {
+            border-color: #d4af37;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.5),
+                0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+        
+        #user-input::placeholder {
+            color: #8b7355;
+            font-style: italic;
+        }
+        
+        #send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+            color: #1a120b;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #send-btn:hover {
+            background: linear-gradient(135deg, #e6c158 0%, #c9a327 100%);
+            transform: scale(1.08);
+            box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
+        }
+        
+        #send-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 角色头像 */
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+        
+        .avatar-anne {
+            border-color: #d4af37;
+        }
+        
+        .avatar-cat-black {
+            border-color: #3e2723;
+        }
+        
+        .avatar-cat-pink {
+            border-color: #8b7355;
+        }
+        
+        /* 装饰性元素 */
+        .decoration {
+            font-size: 16px;
+            margin: 0 2px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+        }
+        
+        /* 滚动条样式 */
+        #chat-area::-webkit-scrollbar,
+        #action-buttons-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        #chat-area::-webkit-scrollbar-track,
+        #action-buttons-container::-webkit-scrollbar-track {
+            background: rgba(44, 28, 18, 0.8);
+            border-radius: 4px;
+        }
+        
+        #chat-area::-webkit-scrollbar-thumb,
+        #action-buttons-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #8b7355 0%, #6d4c3d 100%);
+            border-radius: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        
+        #chat-area::-webkit-scrollbar-thumb:hover,
+        #action-buttons-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #9c815e 0%, #7d5a44 100%);
+        }
+        
+        /* 加载动画 */
+        .typing-indicator {
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .typing-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #d4af37;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite both;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        /* 贵族风格飘花 */
+        .floating-element {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            animation: floatElement linear infinite;
+        }
+        
+        @keyframes floatElement {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(730px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 进度条 */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(139, 115, 85, 0.3);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8b7355, #d4af37);
+            border-radius: 2px;
+            width: 8.33%; /* 1/12 */
+            transition: width 0.5s ease;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            #game-container {
+                height: 100vh;
+                max-height: 720px;
+                border-radius: 0;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .action-btn {
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+            
+            .action-btn i {
+                font-size: 12px;
+            }
+            
+            #action-title {
+                font-size: 12px;
+            }
+        }
+        
+        /* 小屏幕优化 */
+        @media (max-width: 380px) {
+            .action-btn span {
+                max-width: 60px;
+            }
+            
+            #action-buttons {
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- 贵族纹章装饰 -->
+        <div class="heraldic-decoration decoration-1"></div>
+        <div class="heraldic-decoration decoration-2"></div>
+        
+        <!-- 状态栏 -->
+        <div id="status-bar">
+            <div id="month-display">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="current-month">第1/12轮 • 秋季</span>
+            </div>
+            <div id="reputation">
+                <i class="fas fa-crown"></i>
+                <span id="reputation-value">声望：良好</span>
+            </div>
+        </div>
+        
+        <!-- 游戏标题 -->
+        <div id="game-header">
+            <h1>✨《子爵小姐的婚事》✨</h1>
+            <p>扮演安妮·博林，在12个月内通过婚姻拯救家族遗产</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="time-progress"></div>
+            </div>
+        </div>
+        
+        <!-- 对话区域 -->
+        <div id="chat-area">
+            <!-- 对话将在这里动态生成 -->
+        </div>
+        
+        <!-- 行动选择区域 - 精简为一行 -->
+        <div id="action-area">
+            <div id="action-title">
+                <i class="fas fa-chess-queen"></i> 本月可采取的行动
+            </div>
+            <div id="action-buttons-container">
+                <div id="action-buttons">
+                    <!-- 行动按钮将在这里动态生成 -->
+                </div>
+            </div>
+            <div id="action-points">
+                <span>行动点：</span>
+                <div class="action-point available"></div>
+                <div class="action-point available"></div>
+                <div class="action-point available"></div>
+            </div>
+        </div>
+        
+        <!-- 输入区域 -->
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="输入对话或选择行动..." maxlength="250" autocomplete="off">
+            <button id="send-btn">
+                <i class="fas fa-feather-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态管理
+        const gameState = {
+            currentMonth: 1,
+            totalMonths: 12,
+            season: "秋季",
+            reputation: "良好",
+            reputationValue: 75,
+            actionPoints: 3,
+            maxActionPoints: 3,
+            characters: {
+                anne: { name: "安妮·博林", title: "子爵小姐" },
+                system: { name: "系统", title: "" },
+                ai: { name: "游戏主持", title: "" },
+                mother: { name: "博林夫人", title: "子爵夫人" },
+                father: { name: "博林子爵", title: "" },
+                maid: { name: "珍妮", title: "贴身女仆" }
+            },
+            maleCharacters: [
+                { 
+                    id: 1, 
+                    name: "理查德·温斯顿", 
+                    title: "先生", 
+                    emoji: "💰", 
+                    description: "25岁，郡里最富有的绅士，坐拥带意大利式花园的山景宅邸",
+                    color: "#d4af37",
+                    status: "未接触"
+                },
+                { 
+                    id: 2, 
+                    name: "爱德华·科珀", 
+                    title: "爵士", 
+                    emoji: "⚔️", 
+                    description: "24岁，战斗英雄，凭战功受封爵士，领政府年金度日",
+                    color: "#8b7355",
+                    status: "未接触"
+                },
+                { 
+                    id: 3, 
+                    name: "查理·霍华德", 
+                    title: "勋爵", 
+                    emoji: "🏰", 
+                    description: "21岁，伯爵之子，未来的伯爵继承人，温泉社交季随父母到访",
+                    color: "#c9b29a",
+                    status: "未接触"
+                },
+                { 
+                    id: 4, 
+                    name: "塞缪尔·格林", 
+                    title: "先生", 
+                    emoji: "🌾", 
+                    description: "19岁，本地乡绅长子，务实可靠的农场管理者",
+                    color: "#7d9c6d",
+                    status: "未接触"
+                },
+                { 
+                    id: 5, 
+                    name: "威廉·卡特", 
+                    title: "先生", 
+                    emoji: "📜", 
+                    description: "20岁，从伦敦来的新锐律师，思维敏捷、谈吐风趣",
+                    color: "#6d8b9c",
+                    status: "未接触"
+                },
+                { 
+                    id: 6, 
+                    name: "乔治·奥斯本", 
+                    title: "男爵", 
+                    emoji: "🕯️", 
+                    description: "23岁，年轻男爵，继承爵位与庄园，与母亲相依为命",
+                    color: "#9c6d8b",
+                    status: "未接触"
+                }
+            ],
+            clues: [],
+            relationships: {},
+            currentScene: "church",
+            availableActions: [
+                { 
+                    id: "social", 
+                    name: "社交窥探 🎉", 
+                    icon: "fa-glass-cheers", 
+                    description: "参加舞会或茶会，收集关于绅士们的坊间传言和社交评价",
+                    cost: 1,
+                    shortName: "社交"
+                },
+                { 
+                    id: "visit", 
+                    name: "私下拜访 🚪", 
+                    icon: "fa-home", 
+                    description: "前往目标绅士的住处进行正式拜访，观察生活细节与真实状况",
+                    cost: 1,
+                    shortName: "拜访"
+                },
+                { 
+                    id: "letter", 
+                    name: "信件追问 ✉️", 
+                    icon: "fa-envelope", 
+                    description: "通过书信往来了解绅士的品味、学识与真实意图",
+                    cost: 1,
+                    shortName: "信件"
+                },
+                { 
+                    id: "mother", 
+                    name: "母亲打听 🗣️", 
+                    icon: "fa-female", 
+                    description: "请母亲动用旧人脉网络，了解对方家族的陈年旧事与真实背景",
+                    cost: 1,
+                    shortName: "母亲"
+                },
+                { 
+                    id: "maid", 
+                    name: "女仆侦查 👩🏻", 
+                    icon: "fa-user-secret", 
+                    description: "派遣贴身女仆去对方宅邸与仆人交流，获取最真实的内部信息",
+                    cost: 1,
+                    shortName: "女仆"
+                },
+                { 
+                    id: "chat", 
+                    name: "自由交谈 💬", 
+                    icon: "fa-comments", 
+                    description: "与当前场景中的角色进行自由对话，建立关系或获取信息",
+                    cost: 0,
+                    shortName: "交谈"
+                }
+            ],
+            usedDialogue: new Set(),
+            usedEvents: new Set(),
+            sceneHistory: [],
+            isAIResponding: false,
+            messageQueue: [],
+            processedKeywords: new Set()
+        };
+
+        // 贵族风格漂浮元素
+        function createFloatingElements() {
+            const elementTypes = [
+                { emoji: "⚜️", size: 24 },
+                { emoji: "👑", size: 28 },
+                { emoji: "💎", size: 22 },
+                { emoji: "🏰", size: 26 },
+                { emoji: "🎭", size: 24 }
+            ];
+            
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    const element = document.createElement('div');
+                    element.className = 'floating-element';
+                    element.textContent = elementTypes[Math.floor(Math.random() * elementTypes.length)].emoji;
+                    element.style.fontSize = `${18 + Math.random() * 12}px`;
+                    element.style.left = `${Math.random() * 100}%`;
+                    
+                    const duration = 20 + Math.random() * 25;
+                    const delay = Math.random() * 5;
+                    element.style.animation = `floatElement ${duration}s linear ${delay}s infinite`;
+                    
+                    document.getElementById('game-container').appendChild(element);
+                }, i * 300);
+            }
+        }
+
+        // 防重复对话系统
+        function isDialogueUsed(dialogueKey) {
+            return gameState.usedDialogue.has(dialogueKey);
+        }
+
+        function markDialogueUsed(dialogueKey) {
+            gameState.usedDialogue.add(dialogueKey);
+            if (gameState.usedDialogue.size > 100) {
+                const firstKey = Array.from(gameState.usedDialogue)[0];
+                gameState.usedDialogue.delete(firstKey);
+            }
+        }
+
+        // 消息队列处理
+        function processMessageQueue() {
+            if (gameState.messageQueue.length > 0 && !gameState.isAIResponding) {
+                const message = gameState.messageQueue.shift();
+                createMessage(message.sender, message.content, message.type, message.options);
+                
+                if (gameState.messageQueue.length > 0) {
+                    setTimeout(processMessageQueue, 800);
+                }
+            }
+        }
+
+        // 创建消息元素
+        function createMessage(sender, message, type = "ai", options = {}) {
+            const chatArea = document.getElementById('chat-area');
+            
+            if (type === "ai" && gameState.isAIResponding) {
+                gameState.messageQueue.push({ sender, content: message, type, options });
+                return;
+            }
+            
+            if (type === "ai") gameState.isAIResponding = true;
+            
+            const messageDiv = document.createElement('div');
+            
+            let messageClass = "ai-message";
+            let senderName = sender;
+            let avatarClass = "avatar-cat-black";
+            let displayName = sender;
+            
+            if (type === "user") {
+                messageClass = "user-message";
+                avatarClass = "avatar-anne";
+                displayName = "安妮·博林";
+            } else if (type === "system") {
+                messageClass = "system-message";
+                senderName = "系统";
+                displayName = "系统通知";
+            } else if (type === "mother") {
+                messageClass = "ai-message";
+                avatarClass = "avatar-cat-pink";
+                displayName = "博林夫人";
+            } else if (type === "maid") {
+                messageClass = "ai-message";
+                displayName = "珍妮";
+            }
+            
+            const decoratedMessage = decorateMessage(message, options.preventDecoration);
+            const dialogueKey = `${type}_${decoratedMessage.substring(0, 50)}`;
+            
+            if (isDialogueUsed(dialogueKey) && type !== "user") {
+                const variantMessage = generateDialogueVariant(decoratedMessage, type);
+                messageDiv.className = `message ${messageClass}`;
+                messageDiv.innerHTML = createMessageHTML(displayName, variantMessage, avatarClass, type);
+                markDialogueUsed(`${type}_${variantMessage.substring(0, 50)}`);
+            } else {
+                messageDiv.className = `message ${messageClass}`;
+                messageDiv.innerHTML = createMessageHTML(displayName, decoratedMessage, avatarClass, type);
+                markDialogueUsed(dialogueKey);
+            }
+            
+            chatArea.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                chatArea.scrollTo({
+                    top: chatArea.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 50);
+            
+            if (type === "ai") {
+                setTimeout(() => {
+                    gameState.isAIResponding = false;
+                    processMessageQueue();
+                }, options.delay || 1000);
+            }
+            
+            return messageDiv;
+        }
+
+        // 创建消息HTML
+        function createMessageHTML(senderName, message, avatarClass, type) {
+            const avatarSvg = type === "user" ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="16" fill="#d4af37"/><text x="18" y="24" font-size="16" text-anchor="middle" fill="#1a120b" font-weight="bold">A</text></svg>` :
+                type === "system" ?
+                `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="16" fill="#8b7355"/><text x="18" y="24" font-size="16" text-anchor="middle" fill="#f5e9d9" font-weight="bold">S</text></svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="16" fill="#5d4037"/><text x="18" y="24" font-size="16" text-anchor="middle" fill="#f5e9d9" font-weight="bold">G</text></svg>`;
+            
+            return `
+                <div class="message-sender">
+                    ${type !== "system" ? 
+                        `<img src="data:image/svg+xml;utf8,${encodeURIComponent(avatarSvg)}" class="avatar ${avatarClass}" />` 
+                        : ''
+                    }
+                    <span>${senderName}</span>
+                </div>
+                <div class="message-content">${message}</div>
+            `;
+        }
+
+        // 对话变体生成器
+        function generateDialogueVariant(originalMessage, type) {
+            const variants = {
+                ai: [
+                    (msg) => msg.replace("。", "呢。").replace("！", "哦！"),
+                    (msg) => msg.replace("你可以", "或许你可以考虑").replace("应该", "不妨"),
+                    (msg) => msg + " 当然了，这仅仅是我的建议。",
+                    (msg) => "说到这个，" + msg.toLowerCase(),
+                ],
+                mother: [
+                    (msg) => msg.replace("。", "，亲爱的。").replace("！", "呢！"),
+                    (msg) => "我的孩子，" + msg,
+                    (msg) => msg + " 这是妈妈的经验之谈。",
+                ],
+                maid: [
+                    (msg) => msg.replace("小姐", "小姐呀").replace("。", "呢。"),
+                    (msg) => "我听说" + msg.toLowerCase(),
+                    (msg) => msg + " 这是厨娘悄悄告诉我的。",
+                ]
+            };
+            
+            const typeVariants = variants[type] || variants.ai;
+            const variantFunc = typeVariants[Math.floor(Math.random() * typeVariants.length)];
+            return variantFunc(originalMessage);
+        }
+
+        // 装饰消息内容
+        function decorateMessage(message, preventDecoration = false) {
+            if (preventDecoration) return message;
+            
+            const decorationMap = [
+                { pattern: /教堂/gi, replacement: '⛪' },
+                { pattern: /舞会/gi, replacement: '💃' },
+                { pattern: /婚姻|结婚/gi, replacement: '💍' },
+                { pattern: /庄园/gi, replacement: '🏰' },
+                { pattern: /父亲/gi, replacement: '👨‍🦳' },
+                { pattern: /母亲/gi, replacement: '👩‍🦳' },
+                { pattern: /女仆/gi, replacement: '👩🏻' },
+                { pattern: /律师/gi, replacement: '⚖️' },
+                { pattern: /爵位|贵族/gi, replacement: '👑' },
+                { pattern: /财富|金钱|富有/gi, replacement: '💰' },
+                { pattern: /秘密/gi, replacement: '🤫' },
+                { pattern: /线索/gi, replacement: '🔍' },
+                { pattern: /危机/gi, replacement: '⚠️' },
+                { pattern: /成功/gi, replacement: '🎉' },
+                { pattern: /失败/gi, replacement: '😢' },
+                { pattern: /淑女/gi, replacement: '👸' },
+                { pattern: /绅士/gi, replacement: '🎩' },
+                { pattern: /军队|军人/gi, replacement: '⚔️' },
+                { pattern: /农场|农业/gi, replacement: '🌾' },
+                { pattern: /信件|书信/gi, replacement: '✉️' },
+                { pattern: /蜡烛|烛光/gi, replacement: '🕯️' },
+                { pattern: /花园/gi, replacement: '🌹' },
+                { pattern: /马车/gi, replacement: '🚗' },
+                { pattern: /茶会/gi, replacement: '🍵' },
+                { pattern: /葡萄酒/gi, replacement: '🍷' },
+                { pattern: /时钟|时间/gi, replacement: '⏳' },
+            ];
+            
+            let decorated = message;
+            decorationMap.forEach(item => {
+                decorated = decorated.replace(item.pattern, match => `${item.replacement}${match}`);
+            });
+            
+            const nobleSuffixes = [
+                '', '', '',
+                '，我亲爱的。',
+                '，诚如所言。',
+                '，阁下明鉴。',
+                '，您意下如何？',
+                '，望您深思。'
+            ];
+            
+            if (Math.random() > 0.7 && decorated.endsWith('。')) {
+                decorated = decorated.slice(0, -1) + nobleSuffixes[Math.floor(Math.random() * nobleSuffixes.length)];
+            }
+            
+            return decorated;
+        }
+
+        // 更新行动按钮（精简为一行）
+        function updateActionButtons() {
+            const actionButtons = document.getElementById('action-buttons');
+            actionButtons.innerHTML = '';
+            
+            gameState.availableActions.forEach(action => {
+                const button = document.createElement('button');
+                button.className = 'action-btn';
+                button.innerHTML = `<i class="fas ${action.icon}"></i> <span>${action.shortName || action.name}</span>`;
+                button.title = action.description;
+                button.dataset.actionId = action.id;
+                
+                // 添加行动点限制视觉提示
+                if (gameState.actionPoints < action.cost) {
+                    button.style.opacity = '0.6';
+                    button.style.cursor = 'not-allowed';
+                    button.title = `行动点不足（需要${action.cost}点）`;
+                } else {
+                    button.addEventListener('click', () => {
+                        handleAction(action.id);
+                    });
+                }
+                
+                actionButtons.appendChild(button);
+            });
+            
+            // 更新行动点显示
+            updateActionPointsDisplay();
+        }
+
+        // 更新行动点显示
+        function updateActionPointsDisplay() {
+            const actionPointsContainer = document.getElementById('action-points');
+            const pointsSpan = actionPointsContainer.querySelector('span');
+            pointsSpan.textContent = `行动点：${gameState.actionPoints}/${gameState.maxActionPoints}`;
+            
+            // 更新行动点圆圈
+            const pointElements = actionPointsContainer.querySelectorAll('.action-point');
+            pointElements.forEach((point, index) => {
+                point.className = 'action-point';
+                if (index < gameState.actionPoints) {
+                    point.classList.add('available');
+                } else {
+                    point.classList.add('used');
+                }
+            });
+        }
+
+        // 处理行动选择
+        function handleAction(actionId) {
+            const userInput = document.getElementById('user-input');
+            
+            // 检查行动点
+            const action = gameState.availableActions.find(a => a.id === actionId);
+            if (action.cost > gameState.actionPoints) {
+                createMessage("系统", "⚠️ 行动点不足！本月你已消耗了太多精力，需要等待下个月恢复。", "system");
+                return;
+            }
+            
+            // 消耗行动点
+            if (action.cost > 0) {
+                gameState.actionPoints -= action.cost;
+                updateActionPointsDisplay();
+                updateActionButtons(); // 更新按钮状态
+            }
+            
+            // 根据行动类型填充输入框
+            switch(actionId) {
+                case 'social':
+                    userInput.value = "我想参加本月的社交活动，收集关于绅士们的最新信息。";
+                    break;
+                case 'visit':
+                    userInput.value = "我打算对某位绅士进行一次正式的拜访，观察他的真实生活环境。";
+                    break;
+                case 'letter':
+                    userInput.value = "请帮我准备信纸和墨水，我想给某位绅士写一封信。";
+                    break;
+                case 'mother':
+                    userInput.value = "母亲，您能运用您的人脉，帮我打听一下那几位绅士的家庭背景吗？";
+                    break;
+                case 'maid':
+                    userInput.value = "珍妮，我需要你帮我悄悄打听一些消息...";
+                    break;
+                case 'chat':
+                    userInput.value = "";
+                    userInput.placeholder = "输入你想说的话或问题...";
+                    break;
+            }
+            
+            userInput.focus();
+            
+            // 添加行动确认
+            setTimeout(() => {
+                createMessage("系统", `📝 已选择行动：${action.name}`, "system", { preventDecoration: true });
+            }, 300);
+        }
+
+        // 更新游戏状态显示
+        function updateStatusDisplay() {
+            document.getElementById('current-month').textContent = 
+                `第${gameState.currentMonth}/${gameState.totalMonths}轮 • ${gameState.season}`;
+            document.getElementById('reputation-value').textContent = 
+                `声望：${gameState.reputation}`;
+            
+            // 更新时间进度条
+            const progressPercent = (gameState.currentMonth / gameState.totalMonths) * 100;
+            document.getElementById('time-progress').style.width = `${progressPercent}%`;
+        }
+
+        // 初始化游戏
+        function initGame() {
+            // 创建贵族风格装饰
+            createFloatingElements();
+            
+            // 更新状态显示
+            updateStatusDisplay();
+            
+            // 更新行动按钮
+            updateActionButtons();
+            
+            // 添加初始游戏消息
+            createMessage("系统", 
+                "✨《子爵小姐的婚事》—— 贵族婚恋游戏开始！✨\n" +
+                "🏰 背景：摄政时期，英格兰乡村", 
+                "system"
+            );
+            
+            setTimeout(() => {
+                createMessage("系统",
+                    "📜 你扮演安妮·博林，18岁的子爵独生女。表面上，你是郡里小有名气的淑女，举止优雅、仪态万方。\n" +
+                    "💔 但实际上，你的家族濒临破产，庄园佃租拖欠、祖传珍宝暗中典当...若12个月内未能通过联姻保住家产，博林家的产业将被远方亲戚吞并。",
+                    "system"
+                );
+            }, 800);
+            
+            setTimeout(() => {
+                createMessage("系统",
+                    "⏳ 时间紧迫：你只有12个月（12轮游戏）的时间寻找合适的结婚对象。\n" +
+                    "🎯 目标：通过婚姻拯救家族遗产，同时尽可能找到真挚的感情。",
+                    "system"
+                );
+            }, 1600);
+            
+            // 初始场景：教堂礼拜日
+            setTimeout(() => {
+                showInitialScene();
+            }, 2500);
+        }
+
+        // 显示初始场景
+        function showInitialScene() {
+            gameState.currentScene = "church";
+            gameState.sceneHistory.push("church");
+            
+            createMessage("游戏主持", 
+                "⛪ **场景：圣玛丽教堂礼拜日**\n\n" +
+                "晨光透过哥特式彩色玻璃窗，将红、蓝、金色的光影洒在古老的石砌地面上。空气中弥漫着旧橡木椅、蜂蜡蜡烛和干燥薰衣草的混合气息，这是英格兰乡村教堂特有的味道。\n\n" +
+                "你与父母一同坐在博林家族三代的专用长椅上——第五排左侧，离圣坛不远不近，恰如其分地显示了子爵家族在教区中的地位。你能感受到身后投来的各种目光：年轻淑女们好奇的窥视、母亲们评判的打量、还有几位老绅士同情的低语。\n\n" +
+                "母亲轻轻碰了碰你的手臂，她戴着蕾丝手套的手指冰凉：『安妮，背挺直，下巴微收。记住，今天全镇的体面人家都会来，特别是那几位单身绅士...』她停顿了一下，声音压得更低，『...记住我们的处境，每一个细节都可能决定家族的命运。』\n\n" +
+                "父亲在一旁沉默地翻着《公祷书》，他的指节因用力而发白。你知道他在想什么——抵押给伦敦银行家的家族徽章，还有下季度就到期的佃租。",
+                "ai"
+            );
+            
+            setTimeout(() => {
+                createMessage("游戏主持",
+                    "🕰️ 礼拜终于结束，管风琴的最后一个音符在拱顶下消散。人们在教堂庭院里展开周日的社交仪式，阳光穿过榆树叶，在地面投下斑驳光影。\n\n" +
+                    "你深吸一口气，调整好裙摆，随着父母走出教堂。庭院里，六位未婚绅士各自形成了小小的社交圈。他们都将是你未来12个月中潜在的结婚对象：",
+                    "ai"
+                );
+            }, 1200);
+            
+            // 介绍六位男性角色
+            setTimeout(() => {
+                const characterDescriptions = [
+                    "💰 **理查德·温斯顿先生**站在喷泉旁，穿着剪裁完美的深蓝色双排扣外套，阳光照在他金色的怀表链上闪烁微光。",
+                    "⚔️ **爱德华·科珀爵士**身姿笔挺地站在老榆树下，左脸颊有一道淡白的疤痕，为英俊的面容平添几分军人的威严。",
+                    "🏰 **查理·霍华德勋爵**被一群仰慕者围着，他金色的头发在阳光下宛如王冠，穿着伦敦最时髦的浅灰色晨礼服。",
+                    "🌾 **塞缪尔·格林先生**正与自家妹妹聊天，突然爆发的笑声爽朗真诚，他的靴子上沾着新鲜红土，在一众光鲜绅士中显得格外朴实。",
+                    "📜 **威廉·卡特先生**倚在廊柱边，正与老法官讨论法律问题，语速快而清晰，显示出律师的专业素养。",
+                    "🕯️ **乔治·奥斯本男爵**独自站在教堂阴影最深的角落，几乎与哥特式石柱融为一体，指尖轻轻摩挲着一本边缘磨损的皮面圣经。"
+                ];
+                
+                characterDescriptions.forEach((desc, index) => {
+                    setTimeout(() => {
+                        createMessage("游戏主持", desc, "ai");
+                    }, index * 600);
+                });
+            }, 2000);
+            
+            // 最后的选择提示
+            setTimeout(() => {
+                createMessage("游戏主持",
+                    "\n🍂 秋风拂过庭院，卷起几片金黄落叶，带来远处苹果园的香气。几位淑女正相约下周的刺绣聚会。\n\n" +
+                    "母亲轻推你：『该去打招呼了，安妮。记住，微笑要矜持，谈话要得体。』\n\n" +
+                    "**现在，你决定如何开始你的计划？**\n" +
+                    "你可以使用上方的行动按钮，或直接输入你想说的话。",
+                    "ai"
+                );
+            }, 5600);
+        }
+
+        // 处理用户发送消息
+        async function handleUserMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (message === '') return;
+            
+            // 添加用户消息
+            createMessage("安妮·博林", message, "user");
+            
+            // 处理用户输入并生成AI响应
+            await generateAIResponse(message);
+            
+            // 清空输入框
+            userInput.value = '';
+            userInput.placeholder = "输入对话或选择行动...";
+        }
+
+        // 生成AI响应
+        async function generateAIResponse(userMessage) {
+            try {
+                const messageHash = userMessage.substring(0, 30);
+                if (gameState.processedKeywords.has(messageHash)) {
+                    userMessage = userMessage + "?";
+                }
+                gameState.processedKeywords.add(messageHash);
+                
+                if (gameState.processedKeywords.size > 50) {
+                    const firstKey = Array.from(gameState.processedKeywords)[0];
+                    gameState.processedKeywords.delete(firstKey);
+                }
+                
+                // 显示AI正在输入的指示
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'message ai-message';
+                typingIndicator.innerHTML = `
+                    <div class="message-sender">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='16' fill='%235d4037'/><text x='18' y='24' font-size='16' text-anchor='middle' fill='%23f5e9d9' font-weight='bold'>G</text></svg>" class="avatar avatar-cat-black" />
+                        <span>游戏主持</span>
+                        <div class="typing-indicator">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('chat-area').appendChild(typingIndicator);
+                document.getElementById('chat-area').scrollTop = document.getElementById('chat-area').scrollHeight;
+                
+                // 模拟AI思考时间
+                await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 1000));
+                
+                // 移除输入指示
+                typingIndicator.remove();
+                
+                // 生成响应
+                let response = "";
+                let responseType = "ai";
+                
+                const lowerMessage = userMessage.toLowerCase();
+                
+                // 社交活动相关
+                if (lowerMessage.includes("舞会") || lowerMessage.includes("茶会") || lowerMessage.includes("社交")) {
+                    response = "💃 **秋季舞会邀请**\n\n本月的社交日历上有几场重要活动：温斯顿宅邸秋季舞会、科珀爵士的军官茶会、霍华德家的私密晚宴。每场活动都能提供不同的情报。你想重点关注哪一场？";
+                } 
+                // 拜访相关
+                else if (lowerMessage.includes("拜访") || lowerMessage.includes("住处") || lowerMessage.includes("观察")) {
+                    response = "🚪 **正式拜访计划**\n\n私下拜访能观察绅士真实生活状况。推荐借口：归还借阅书籍、赠送自制果酱、请教园艺问题。你想拜访哪一位？每位绅士的家都能讲述不同的故事。";
+                }
+                // 书信相关
+                else if (lowerMessage.includes("信") || lowerMessage.includes("写信") || lowerMessage.includes("书信")) {
+                    response = "✉️ **书信往来策略**\n\n书信是淑女与绅士间最得体、最安全的交流方式。推荐话题：文学探讨、园艺交流、慈善询问、音乐讨论。威廉·卡特律师可能回信最快，而乔治·奥斯本男爵可能根本不回复。";
+                }
+                // 母亲相关
+                else if (lowerMessage.includes("妈妈") || lowerMessage.includes("母亲") || lowerMessage.includes("母亲")) {
+                    responseType = "mother";
+                    response = "👩‍🦳 你的母亲放下手中的刺绣，将你拉到客厅角落：『温斯顿家的财富是实实在在的，但他父亲那边有痛风的病史。科珀爵士的年金够体面但攒不下大钱。霍华德勋爵家世最好，可伯爵夫人要求未来儿媳至少有五万英镑嫁妆...』她叹了口气，『你想具体了解哪一家？』";
+                }
+                // 女仆侦查相关
+                else if (lowerMessage.includes("珍妮") || lowerMessage.includes("女仆") || lowerMessage.includes("打听")) {
+                    responseType = "maid";
+                    response = "👩🏻 你的贴身女仆珍妮压低声音：『小姐，我表姐在奥斯本男爵家帮厨，说男爵夫人节俭得过分。温斯顿先生家的女仆说东家常和伦敦律师开会到深夜。科珀爵士的勤务兵抱怨爵士把大部分年金都寄给了阵亡战友的遗孀...想让我重点打听哪家？』";
+                }
+                // 具体角色询问
+                else if (lowerMessage.includes("理查德") || lowerMessage.includes("温斯顿")) {
+                    response = "💰 **理查德·温斯顿先生**注意到你的目光，礼貌地颔首致意，笑容如秋日暖阳。他的外套是伦敦萨维尔街定制，怀表是宝玑的最新款式。据园丁透露，他最近在引进意大利稀有玫瑰品种。要上前交谈吗？";
+                }
+                else if (lowerMessage.includes("爱德华") || lowerMessage.includes("科珀")) {
+                    response = "⚔️ **爱德华·科珀爵士**的目光与你相遇，他微微点头——不是社交场合那种轻浮的致意，而是军人之间严肃的认可。他的勤务兵曾透露，爵士每晚都会在书房阅读军事历史和哲学书籍。要接近这样一位经历过战争的人，你需要表现出相应的稳重。";
+                }
+                else if (lowerMessage.includes("查理") || lowerMessage.includes("霍华德")) {
+                    response = "🏰 **查理·霍华德勋爵**结束了与主教的谈话，转身时目光与你相遇。他的蓝眼睛评估性地扫过你，从发饰到鞋尖，然后给出一个完美的社交微笑。霍华德伯爵一家只在温泉社交季来此，计划停留三个月，这意味着你的时间有限。";
+                }
+                else if (lowerMessage.includes("塞缪尔") || lowerMessage.includes("萨姆") || lowerMessage.includes("格林")) {
+                    response = "🌾 **塞缪尔·格林先生**注意到你在看他，愣了一秒，然后露出那种有点害羞但无比真诚的笑容，甚至轻轻挥了挥手——这在正式社交场合略显失礼，却也格外可爱。格林家是本地最大的粮食供应商，去年歉收时主动降低了佃农的租金。";
+                }
+                else if (lowerMessage.includes("威廉") || lowerMessage.includes("卡特")) {
+                    response = "📜 **威廉·卡特先生**收起烟盒，径直向你走来：『博林小姐，请原谅我的冒昧，但我注意到您对法律讨论似乎感兴趣？』他的眼睛在笑，那是智者在发现同类时的愉悦。有传言说某位伯爵正考虑聘请他为家族律师。";
+                }
+                else if (lowerMessage.includes("乔治") || lowerMessage.includes("奥斯本")) {
+                    response = "🕯️ **乔治·奥斯本男爵**突然抬头，目光穿过庭院直直落在你身上。那目光深邃、探究，仿佛能看透表面直达本质。然后，他微微颔首——不是社交致意，更像是某种确认。男爵庄园有12间卧室但只开放了4间，这是一个谜。";
+                }
+                else if (lowerMessage.includes("你好") || lowerMessage.includes("您好") || lowerMessage.includes("问候")) {
+                    response = "👋 绅士们纷纷回礼：温斯顿先生赞美得体，科珀爵士简洁关注，霍华德勋爵完美但缺乏温度，格林先生憨厚可爱，卡特先生机智愉悦，奥斯本男爵沉默注视。接下来你想与谁深入交谈？";
+                }
+                else if (lowerMessage.includes("破产") || lowerMessage.includes("财务") || lowerMessage.includes("钱")) {
+                    response = "🤫 母亲的脸色瞬间苍白：『安妮，看在上帝的份上！这些话永远不能在公共场合说！我们还有时间，你外祖母的珍珠项链还能当150英镑。但最终...一切都取决于你，我的孩子。一场好婚姻不仅能还清债务，还能恢复我们的地位。』";
+                }
+                else if (lowerMessage.includes("怎么办") || lowerMessage.includes("建议") || lowerMessage.includes("应该")) {
+                    response = "💭 **策略建议**：\n1. **情报收集（第1-3个月）**：参加社交活动，收集背景信息\n2. **重点突破（第4-8个月）**：筛选目标，建立私人关系\n3. **最终抉择（第9-12个月）**：评估可能性，做出决定\n\n先从社交窥探开始，听听最新传言。";
+                }
+                else {
+                    response = generateDefaultResponse();
+                }
+                
+                // 发送响应
+                createMessage(responseType === "ai" ? "游戏主持" : responseType === "mother" ? "博林夫人" : "珍妮", 
+                    response, responseType);
+                
+                // 每月结束时推进时间
+                if (shouldAdvanceMonth(userMessage)) {
+                    advanceMonth();
+                }
+                
+            } catch (error) {
+                console.error("AI响应生成错误:", error);
+                createMessage("系统", "⚙️ 游戏引擎遇到了一个轻微的技术问题，但已恢复正常。请继续您的游戏体验。", "system", { preventDecoration: true });
+                createMessage("游戏主持", "请原谅刚才的短暂停顿。回到我们的故事——您刚才说到？", "ai");
+            }
+        }
+
+        // 生成默认响应
+        function generateDefaultResponse() {
+            const currentScene = gameState.currentScene;
+            
+            const defaultResponses = {
+                church: [
+                    "⛪ 教堂钟声再次响起，提醒人们该离开了。牧师在门口与每个人道别。你注意到温斯顿先生正朝你的方向看来，似乎想找机会交谈。",
+                    "🍂 秋风突然转强，卷起庭院中的落叶形成小小的金色旋风。格林先生本能地侧身为妹妹挡风，这个小动作显示出他保护家人的本能。",
+                    "🕰️ 时间悄然流逝，母亲轻轻碰了碰你的手臂：『该回家了，安妮。我们可以马车上讨论今天的观察。』"
+                ],
+                default: [
+                    "💭 你的话语在社交场合中得体而恰当。记住，每位绅士都在观察你，正如你在观察他们。",
+                    "🎭 在英格兰乡村的社交舞台上，每个微笑、每次点头、每句问候都承载着多重含义。",
+                    "📖 像简·奥斯汀笔下的女主角一样，你面临着相似的困境与选择。"
+                ]
+            };
+            
+            const sceneResponses = defaultResponses[currentScene] || defaultResponses.default;
+            const randomIndex = Math.floor(Math.random() * sceneResponses.length);
+            let response = sceneResponses[randomIndex];
+            
+            // 根据月份添加时间提示
+            if (gameState.currentMonth >= 10) {
+                response += "\n\n⚠️ 时间提醒：只剩下" + (12 - gameState.currentMonth) + "个月了。";
+            }
+            
+            return response;
+        }
+
+        // 判断是否应该推进月份
+        function shouldAdvanceMonth(userMessage) {
+            const isSignificantAction = userMessage.length > 20 || 
+                userMessage.includes("拜访") || 
+                userMessage.includes("写信") || 
+                userMessage.includes("参加");
+            
+            const randomChance = Math.random() > 0.85;
+            
+            return (isSignificantAction && randomChance) && gameState.currentMonth < gameState.totalMonths;
+        }
+
+        // 推进到下一个月
+        function advanceMonth() {
+            gameState.currentMonth++;
+            gameState.actionPoints = 3; // 每月重置行动点
+            
+            // 更新季节
+            if (gameState.currentMonth <= 3) {
+                gameState.season = "秋季";
+            } else if (gameState.currentMonth <= 8) {
+                gameState.season = "冬季";
+            } else if (gameState.currentMonth <= 11) {
+                gameState.season = "春季";
+            } else {
+                gameState.season = "夏季终局";
+            }
+            
+            // 更新显示
+            updateStatusDisplay();
+            updateActionPointsDisplay();
+            updateActionButtons();
+            
+            // 每月开始消息
+            setTimeout(() => {
+                createMessage("系统", 
+                    `📅 **第${gameState.currentMonth}/12个月开始** - ${gameState.season}`, 
+                    "system"
+                );
+                
+                let seasonDescription = "";
+                if (gameState.season === "冬季") {
+                    seasonDescription = "❄️ 冬季来临，大地银装素裹。社交活动转入温暖的室内。";
+                } else if (gameState.season === "春季") {
+                    seasonDescription = "🌸 春天到来，万物复苏。求婚窗口期正式开启！";
+                } else if (gameState.season === "夏季终局") {
+                    seasonDescription = "☀️ 最后一个月！夏季终局，收获或毁灭的时刻。";
+                } else {
+                    seasonDescription = "🍂 秋季继续，社交季节深入。关系开始巩固。";
+                }
+                
+                createMessage("系统", seasonDescription, "system");
+                
+                // 随机事件
+                if (Math.random() > 0.4 && gameState.currentMonth < 12) {
+                    triggerRandomEvent();
+                }
+                
+                // 每月提示
+                setTimeout(() => {
+                    createMessage("游戏主持", `光阴似箭，现在是第${gameState.currentMonth}个月。你有3个行动点可以支配。明智地选择你的策略。`, "ai");
+                }, 1000);
+                
+            }, 800);
+        }
+
+        // 触发随机事件
+        function triggerRandomEvent() {
+            const events = [
+                {
+                    key: "rose_garden",
+                    message: "🌹 **庄园玫瑰园的意外发现**\n\n你独自在家族玫瑰园散步，在最古老的一丛玫瑰下发现了一个松动的石板。里面是一个生锈的铁盒，装着你曾祖母的日记和几件朴素但精致的珠宝。",
+                    effect: { reputation: +5 }
+                },
+                {
+                    key: "library_encounter",
+                    message: "📚 **教堂图书室的偶遇**\n\n你在教堂图书室寻找园艺书，却意外遇到了威廉·卡特律师。他正在查阅《财产法》注释本：『博林小姐，真巧。我在研究限定继承权的例外条款...』",
+                    effect: { relationship: { "威廉·卡特": +10 } }
+                },
+                {
+                    key: "market_rumor",
+                    message: "🛒 **集市上的意外情报**\n\n陪母亲去集市时，你无意中听到商人对话：『温斯顿先生又订购了50磅最好的咖啡豆，看来他要在宅邸举办大型活动。』",
+                    effect: { clue: "温斯顿将办大型舞会" }
+                }
+            ];
+            
+            const availableEvents = events.filter(event => !gameState.usedEvents.has(event.key));
+            
+            if (availableEvents.length > 0) {
+                const randomEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+                gameState.usedEvents.add(randomEvent.key);
+                
+                setTimeout(() => {
+                    createMessage("系统", "📌 **本月特殊事件**", "system");
+                    createMessage("游戏主持", randomEvent.message, "ai");
+                    
+                    if (randomEvent.effect.reputation) {
+                        gameState.reputationValue += randomEvent.effect.reputation;
+                        if (gameState.reputationValue > 90) gameState.reputation = "极佳";
+                        else if (gameState.reputationValue > 70) gameState.reputation = "良好";
+                        updateStatusDisplay();
+                    }
+                }, 1500);
+            }
+        }
+
+        // 事件监听器设置
+        function setupEventListeners() {
+            document.getElementById('send-btn').addEventListener('click', handleUserMessage);
+            
+            document.getElementById('user-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleUserMessage();
+                }
+            });
+            
+            // 防止重复快速点击
+            let lastClickTime = 0;
+            document.getElementById('send-btn').addEventListener('click', function() {
+                const now = Date.now();
+                if (now - lastClickTime < 1000) {
+                    return;
+                }
+                lastClickTime = now;
+            });
+            
+            // 行动按钮区域滚动优化
+            const actionButtonsContainer = document.getElementById('action-buttons-container');
+            let isScrolling = false;
+            
+            actionButtonsContainer.addEventListener('wheel', function(e) {
+                if (!isScrolling) {
+                    isScrolling = true;
+                    this.scrollLeft += e.deltaY;
+                    setTimeout(() => {
+                        isScrolling = false;
+                    }, 50);
+                }
+                e.preventDefault();
+            });
+        }
+
+        // 初始化
+        window.onload = function() {
+            initGame();
+            setupEventListeners();
+            
+            // 预加载提示
+            console.log("游戏初始化完成，贵族风格界面已加载");
+        };
+    </script>
+</body>
+</html>
